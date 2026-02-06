@@ -1,0 +1,1329 @@
+openapi: 3.0.1
+info:
+  title: Krista Client API - 3.0.1
+  description: |-
+    help organisation to do sanity.
+  version: 3.0.1
+paths:
+  /accounts/{accountId}:
+    get:
+      summary: Find account by id
+      operationId: getAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: User with given id not found.
+          content:
+            application/json: {}
+  /accounts:
+    get:
+      summary: Get list of all accounts.
+      description: "Search account by name, or email address."
+      operationId: getAccounts
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+  /executions:
+    get:
+      summary: Get list of all running conversation executions.
+      operationId: getExecutions
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+    post:
+      summary: Execute conversation with provided conversation id.
+      operationId: execute
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /executions/{executionId}:
+    get:
+      summary: Find conversation execution by Id.
+      operationId: getExecution
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    delete:
+      summary: Terminate the conversation execution by Id.
+      operationId: terminate
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: NO CONTENT
+          content:
+            application/json: {}
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /executions/{executionId}/messages/{messageId}:
+    get:
+      summary: Find message inside
+      operationId: getMessage
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    put:
+      summary: Submit message using message id.
+      description: Submit current step with the data provided by user.
+      operationId: submitMessage
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageSubmit'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /executions/{executionId}/messages:
+    get:
+      summary: List all message of conversation execution.
+      operationId: getMessages
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offsetId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /conversations/{conversationId}:
+    get:
+      summary: Find conversation by id
+      operationId: getConversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationInfo'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /conversations:
+    get:
+      summary: Get all conversation
+      operationId: getConversations
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Topic'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+  /conversations/{conversationId}/executions:
+    get:
+      summary: Get list of all running conversation executions.
+      operationId: getExecutions_1
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+    post:
+      summary: Execute conversation with provided conversation id.
+      operationId: execute_1
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /conversations/{conversationId}/executions/{executionId}:
+    get:
+      summary: Find conversation execution by Id.
+      operationId: getExecution_1
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    delete:
+      summary: Terminate the conversation execution by Id.
+      operationId: terminate_1
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: NO CONTENT
+          content:
+            application/json: {}
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /conversations/{conversationId}/executions/{executionId}/messages/{messageId}:
+    get:
+      summary: Find message inside
+      operationId: getMessage_1
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    put:
+      summary: Submit message using message id.
+      description: Submit current step with the data provided by user.
+      operationId: submitMessage_1
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageSubmit'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /conversations/{conversationId}/executions/{executionId}/messages:
+    get:
+      summary: List all message of conversation execution.
+      operationId: getMessages_1
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offsetId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /docs/{subPath}:
+    get:
+      operationId: customTabs
+      parameters:
+        - name: subPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: default response
+          content:
+            '*/*': {}
+  /topics/{topicId}/conversations/{conversationId}:
+    get:
+      summary: Find conversation by id
+      operationId: getConversation_1
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationInfo'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/conversations:
+    get:
+      summary: Get all conversation
+      operationId: getConversations_1
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Topic'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+  /topics/{topicId}/conversations/{conversationId}/executions:
+    get:
+      summary: Get list of all running conversation executions.
+      operationId: getExecutions_2
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+    post:
+      summary: Execute conversation with provided conversation id.
+      operationId: execute_2
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/conversations/{conversationId}/executions/{executionId}:
+    get:
+      summary: Find conversation execution by Id.
+      operationId: getExecution_2
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    delete:
+      summary: Terminate the conversation execution by Id.
+      operationId: terminate_2
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: NO CONTENT
+          content:
+            application/json: {}
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/conversations/{conversationId}/executions/{executionId}/messages/{messageId}:
+    get:
+      summary: Find message inside
+      operationId: getMessage_2
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    put:
+      summary: Submit message using message id.
+      description: Submit current step with the data provided by user.
+      operationId: submitMessage_2
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageSubmit'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/conversations/{conversationId}/executions/{executionId}/messages:
+    get:
+      summary: List all message of conversation execution.
+      operationId: getMessages_2
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offsetId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/executions:
+    get:
+      summary: Get list of all running conversation executions.
+      operationId: getExecutions_3
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+    post:
+      summary: Execute conversation with provided conversation id.
+      operationId: execute_3
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Conversation with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/executions/{executionId}:
+    get:
+      summary: Find conversation execution by Id.
+      operationId: getExecution_3
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationExecution'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    delete:
+      summary: Terminate the conversation execution by Id.
+      operationId: terminate_3
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: NO CONTENT
+          content:
+            application/json: {}
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/executions/{executionId}/messages/{messageId}:
+    get:
+      summary: Find message inside
+      operationId: getMessage_3
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDto'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+    put:
+      summary: Submit message using message id.
+      description: Submit current step with the data provided by user.
+      operationId: submitMessage_3
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageSubmit'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}/executions/{executionId}/messages:
+    get:
+      summary: List all message of conversation execution.
+      operationId: getMessages_3
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offsetId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  type: array
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Execution with given id not found.
+          content:
+            application/json: {}
+  /topics/{topicId}:
+    get:
+      summary: Find topic by id
+      operationId: getTopic
+      parameters:
+        - name: topicId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topic'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+        "404":
+          description: Topic with given id not found.
+          content:
+            application/json: {}
+  /topics:
+    get:
+      summary: Get list of all topics.
+      operationId: getTopics
+      parameters:
+        - name: pageIndex
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 50
+            type: integer
+            format: int32
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Topic'
+        "401":
+          description: User not authorized.
+          content:
+            application/json: {}
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        accountId:
+          type: string
+        primaryEmailAddress:
+          type: string
+        inboxId:
+          type: string
+        person:
+          $ref: '#/components/schemas/Person'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        customAttributes:
+          type: object
+          additionalProperties:
+            type: object
+    Person:
+      type: object
+      properties:
+        personId:
+          type: string
+        personName:
+          type: string
+        avatarUrl:
+          type: string
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    ConversationExecution:
+      type: object
+      properties:
+        executionId:
+          type: string
+        initiatorId:
+          type: string
+        initiatorName:
+          type: string
+        conversation:
+          $ref: '#/components/schemas/ConversationInfo'
+        startTime:
+          type: integer
+          format: int64
+    ConversationInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        mode:
+          type: string
+          enum:
+            - DRAFT
+            - TEST
+            - LIVE
+            - "DRAFT, LIVE, TEST"
+        topicId:
+          type: string
+    MessageDto:
+      type: object
+      properties:
+        messageId:
+          type: string
+        userMessage:
+          type: string
+        creationTime:
+          type: integer
+          format: int64
+        flowId:
+          type: string
+        paths:
+          type: array
+          items:
+            type: string
+        sideConversations:
+          type: array
+          items:
+            type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedValuedField'
+        submitType:
+          type: string
+          enum:
+            - SUBMIT
+            - PATH
+            - SIDEBAR
+        submitValue:
+          type: string
+        authenticationMethod:
+          type: string
+        authenticationMeta:
+          type: object
+          additionalProperties:
+            type: object
+    NamedValuedField:
+      type: object
+      properties:
+        fieldType:
+          type: string
+        attributeValues:
+          type: object
+          additionalProperties:
+            type: object
+        options:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NamedValuedField'
+        name:
+          type: string
+        value:
+          type: object
+    MessageSubmit:
+      type: object
+      properties:
+        values:
+          type: object
+          additionalProperties:
+            type: object
+        submitType:
+          type: string
+          enum:
+            - "SUBMIT, PATH, SIDEBAR"
+        submitValue:
+          type: string
+    Topic:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
